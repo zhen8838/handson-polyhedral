@@ -4,7 +4,7 @@ This repo contains the code for the hands-on polyhedral course.
 
 == Lesson
 
-[cols="80%,20%"]
+[width=100%,cols="80%,20%"]
 |===
 | Lesson Name | Note 
 
@@ -19,7 +19,7 @@ This repo contains the code for the hands-on polyhedral course.
 | 7. AST Generation
 
 | 8. Parsing C Code
-1.4+| using https://github.com/inducer/islpy[modified pet]
+1.4+| using https://github.com/zhen8838/pet[modified pet]
 | 9. C CodeGen
 | 10. Loop Transformations
 | 11. Dependence Analysis
@@ -33,6 +33,6 @@ This repo contains the code for the hands-on polyhedral course.
 
 == Reference
 
-1. [islpy](https://github.com/inducer/islpy)
-2. [islplot](https://github.com/tobiasgrosser/islplot)
-3. [polyhedral.info](http://polyhedral.info)
+1. https://github.com/inducer/islpy[islpy]
+2. https://github.com/tobiasgrosser/islplot[islplot]
+3. http://polyhedral.info[polyhedral.info]
