@@ -1,0 +1,38 @@
+== Hands-on Polyhedral
+
+This repo contains the code for the hands-on polyhedral course.
+
+== Lesson
+
+[cols="80%,20%"]
+|===
+| Lesson Name | Note 
+
+
+| 1. Presburger Sets and Relations 
+1.7+| using https://pypi.org/project/isl-python/[isl-python]
+| 2. Iteration Domains 
+| 3. Schedules 
+| 4. Memory Access Analysis 
+| 5. Dependence Analysis 
+| 6. Classical Loop Transformations 
+| 7. AST Generation
+
+| 8. Parsing C Code
+1.4+| using https://github.com/inducer/islpy[modified pet]
+| 9. C CodeGen
+| 10. Loop Transformations
+| 11. Dependence Analysis
+
+| 12. Schedule Program
+1.3+| using https://pypi.org/project/isl-python/[isl-python]
+| 13. Pluto
+| 14. Affine Fusion
+|===
+
+
+== Reference
+
+1. [islpy](https://github.com/inducer/islpy)
+2. [islplot](https://github.com/tobiasgrosser/islplot)
+3. [polyhedral.info](http://polyhedral.info)

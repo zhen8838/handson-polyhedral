@@ -5,8 +5,8 @@ from typing import Tuple, List
 
 def get_point_coordinates(point: isl.point, scale=1) -> List[int]:
   result = []
-  for i in range(point.space().dim(isl.ISL_DIM_TYPE.SET)):
-    result.append(int(point.get_coordinate_val(isl.ISL_DIM_TYPE.SET, i)
+  for i in range(point.space().dim(isl.dim_type.SET)):
+    result.append(int(point.get_coordinate_val(isl.dim_type.SET, i)
                       .get_num_si()) // scale)
   if(len(result) == 1):
     result.append(0)
@@ -24,7 +24,7 @@ def _vertex_to_rational_point(vertex: isl.vertex):
 
   value = []
 
-  for i in range(expr.dim(isl.ISL_DIM_TYPE.OUT)):
+  for i in range(expr.dim(isl.dim_type.OUT)):
     subexpr : isl.aff = expr.get_at(i)
     val : isl.val = subexpr.get_constant_val()
     value.append((val.get_num_si(), val.get_den_si()))
@@ -61,10 +61,10 @@ def _is_vertex_on_constraint(vertex, constraint):
   """
   r = _vertex_to_rational_point(vertex)
 
-  dims = constraint.space.dim(isl.ISL_DIM_TYPE.SET)
+  dims = constraint.space.dim(isl.dim_type.SET)
   v = []
   for d in range(dims):
-    v.append(constraint.get_coefficient_val(isl.ISL_DIM_TYPE.SET, d).get_num_si())
+    v.append(constraint.get_coefficient_val(isl.dim_type.SET, d).get_num_si())
 
   summ = 0
 
@@ -322,12 +322,12 @@ def _constraint_make_equality_set(x):
   e = isl.constraint.alloc_equality(x.get_local_space())
   e = e.set_constant_val(x.get_constant_val().get_num_si())
 
-  for i in range(x.space.dim(isl.ISL_DIM_TYPE.SET)):
-    e = e.set_coefficient_val(isl.ISL_DIM_TYPE.SET, i,
-                              x.get_coefficient_val(isl.ISL_DIM_TYPE.SET, i).get_num_si())
-  for i in range(x.space.dim(isl.ISL_DIM_TYPE.PARAM)):
-    e = e.set_coefficient_val(isl.ISL_DIM_TYPE.PARAM, i,
-                              x.get_coefficient_val(isl.ISL_DIM_TYPE.PARAM, i).get_num_si())
+  for i in range(x.space.dim(isl.dim_type.SET)):
+    e = e.set_coefficient_val(isl.dim_type.SET, i,
+                              x.get_coefficient_val(isl.dim_type.SET, i).get_num_si())
+  for i in range(x.space.dim(isl.dim_type.PARAM)):
+    e = e.set_coefficient_val(isl.dim_type.PARAM, i,
+                              x.get_coefficient_val(isl.dim_type.PARAM, i).get_num_si())
 
   return isl.basic_set.universe(x.space).add_constraint(e)
 
@@ -368,7 +368,7 @@ def get_rectangular_hull(set_data: isl.set, offset=0):
     incr = isl.map("{{[i]->[i+{0}]}}".format(offset))
     decr = isl.map("{{[i]->[i-{0}]}}".format(offset))
 
-    dim_val = isl.aff.zero_on_domain(ls).set_coefficient_si(isl.ISL_DIM_TYPE.IN, dim, 1)
+    dim_val = isl.aff.zero_on_domain(ls).set_coefficient_si(isl.dim_type.IN, dim, 1)
     dim_val = isl.pw_aff(dim_val)
     dim_val = dim_val.as_map()
 

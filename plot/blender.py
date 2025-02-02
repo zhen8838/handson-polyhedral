@@ -1,6 +1,6 @@
 import bpy
 import isl
-from petplot.support import *
+from plot.support import *
 
 def make_material(name, color_diffuse, color_specular, alpha):
     """

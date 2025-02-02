@@ -3,7 +3,7 @@ from matplotlib import colormaps
 from matplotlib import collections
 from matplotlib.ticker import MaxNLocator
 import isl
-from petplot.support import *
+from plot.support import *
 from typing import Tuple, List, Union, Deque
 from dataclasses import dataclass
 
@@ -71,8 +71,7 @@ def _plot_arrow(start, end, graph, *args, **kwargs):
                                    color=color)
                    )
 
-
-def plot_map(map: isl.map, edge_style="-|>", edge_width=1,
+def plot_map(maps: Union[List[isl.union_map], isl.union_map], edge_style="-|>", edge_width=1,
              start_color="blue", end_color="orange", line_color="black", marker_size=7,
              scale=1, shrink=6):
     """
@@ -88,26 +87,39 @@ def plot_map(map: isl.map, edge_style="-|>", edge_width=1,
                    to.
     :param scale: Scale the values.
     """
-    all_start: List[Tuple[int, int]] = []
-    all_ends: List[Tuple[int, int]] = []
-    start_points: List[isl.point] = []
-    map_datas: List[isl.basic_map] = []
+
+    bmap_datas: List[isl.basic_map] = []
     labels: List[str] = []
-    map.foreach_basic_map(lambda bmap: map_datas.append(bmap))
-    for map_data in map_datas:
-        if len(labels) == 0:
-            sp = map_data.get_space()
-            for i in range(2):
-                if sp.dim(isl.ISL_DIM_TYPE.OUT) > i:
-                    if sp.has_dim_name(isl.ISL_DIM_TYPE.OUT, i):
-                        labels.append(sp.get_dim_name(isl.ISL_DIM_TYPE.OUT, i))
-                    else:
-                        labels.append("")
-            labels.reverse()
-        map_data.range().foreach_point(start_points.append)
+    if not isinstance(maps, list):
+        maps = [maps] 
+    for umap in maps:
+      umap.foreach_map(lambda map: map.foreach_basic_map(lambda bmap: bmap_datas.append(bmap)))
+
+    # try get the labels
+    if len(labels) == 0:
+      labels = ["", ""]
+      for bmap_data in bmap_datas:
+          bmap_labels = []
+          sp = bmap_data.get_space()
+          for i in range(2):
+              if sp.dim(isl.dim_type.OUT) > i:
+                  if sp.has_dim_name(isl.dim_type.OUT, i):
+                      bmap_labels.append(sp.get_dim_name(isl.dim_type.OUT, i))
+                  else:
+                      bmap_labels.append("")
+          bmap_labels.reverse()
+          for i in range(2):
+            if labels[i] == "" and i < len(bmap_labels):
+              labels[i] = bmap_labels[i]
+
+    for bmap_data in bmap_datas:
+        all_start: List[Tuple[int, int]] = []
+        all_ends: List[Tuple[int, int]] = []
+        start_points: List[isl.point] = []
+        bmap_data.range().foreach_point(start_points.append)
         for start in start_points:
             end_points: List[isl.point] = []
-            limited = map_data.intersect_range(isl.set(start))
+            limited = bmap_data.intersect_range(isl.set(start))
             limited.domain().foreach_point(end_points.append)
             s = get_point_coordinates(start, scale)
             s.reverse()

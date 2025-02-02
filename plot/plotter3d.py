@@ -1,6 +1,6 @@
 import isl
 from typing import Tuple, Union, List
-from petplot.support import *
+from plot.support import *
 import matplotlib.pyplot as _plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.patches import FancyArrowPatch
