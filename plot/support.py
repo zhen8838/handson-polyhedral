@@ -8,7 +8,7 @@ def get_point_coordinates(point: isl.point, scale=1) -> List[int]:
   for i in range(point.space().dim(isl.dim_type.SET)):
     result.append(int(point.get_coordinate_val(isl.dim_type.SET, i)
                       .get_num_si()) // scale)
-  if(len(result) == 1):
+  if (len(result) == 1):
     result.append(0)
   return result
 
@@ -20,13 +20,13 @@ def _vertex_to_rational_point(vertex: isl.vertex):
   specific dimension with the first element of the pair being the nominator
   and the second element being the denominator.
   """
-  expr : isl.multi_aff = vertex.get_expr()
+  expr: isl.multi_aff = vertex.get_expr()
 
   value = []
 
   for i in range(expr.dim(isl.dim_type.OUT)):
-    subexpr : isl.aff = expr.get_at(i)
-    val : isl.val = subexpr.get_constant_val()
+    subexpr: isl.aff = expr.get_at(i)
+    val: isl.val = subexpr.get_constant_val()
     value.append((val.get_num_si(), val.get_den_si()))
 
   return value
@@ -92,9 +92,10 @@ def bset_get_vertex_coordinates(bset_data: isl.basic_set, scale=1):
   """
 
   # Get the vertices.
-  vertices : List[List[float]]= []
+  vertices: List[List[float]] = []
   bset_data.compute_vertices().foreach_vertex(vertices.append)
-  def f(x): 
+
+  def f(x):
     return _vertex_get_coordinates(x, scale)[::-1]
   vertices = np.array(list(map(f, vertices)))
 
@@ -106,8 +107,8 @@ def bset_get_vertex_coordinates(bset_data: isl.basic_set, scale=1):
   # We select a 'center' point that lies within the convex hull of the
   # vertices. We then sort all points according to the direction (given as an
   # angle in radiens) they lie in respect to the center point.
-  center = np.sum(vertices[:2],0) / 2
-  if vertices.shape[1]==3:
+  center = np.sum(vertices[:2], 0) / 2
+  if vertices.shape[1] == 3:
     A = vertices[0]
     B = vertices[1]
     C = vertices[2]
@@ -137,7 +138,7 @@ def sub(A, B):
 
 
 def norm(A, B, C):
-  return(cross(sub(A, C), sub(B, C)))
+  return (cross(sub(A, C), sub(B, C)))
 
 
 def dotProduct(A, B):
@@ -332,7 +333,7 @@ def _constraint_make_equality_set(x):
   return isl.basic_set.universe(x.space).add_constraint(e)
 
 
-def bset_get_points(bset_data, only_hull=False, scale=1) -> List[List[int]]:
+def bset_get_points(uset: isl.union_set, only_hull=False, scale=1) -> List[List[int]]:
   """
   Given a basic set return the points within this set
 
@@ -343,18 +344,18 @@ def bset_get_points(bset_data, only_hull=False, scale=1) -> List[List[int]]:
 
   if only_hull:
     hull = [None]
-    hull[0] = isl.set.empty(bset_data.space)
+    hull[0] = isl.set.empty(uset.space)
 
     def add(c):
       const_eq = _constraint_make_equality_set(c)
-      const_eq = const_eq.intersect(bset_data)
+      const_eq = const_eq.intersect(uset)
       hull[0] = hull[0].union(const_eq)
-    bset_data.foreach_constraint(add)
-    bset_data = hull[0]
+    uset.foreach_constraint(add)
+    uset = hull[0]
 
   points = []
   def f(x): return points.append(get_point_coordinates(x, scale))
-  bset_data.foreach_point(f)
+  uset.foreach_point(f)
   points = sorted(points)
   return points
 

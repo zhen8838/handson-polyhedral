@@ -5,7 +5,6 @@ import isl
 from utils.common import CSource
 
 
-
 def isl_mat_to_numpy(mat: isl.mat):
   return np.array([[mat.get_element_val(i, j).get_num_si()
                     for j in range(mat.cols())]
@@ -79,6 +78,18 @@ def bmap_dim_titles(m: isl.basic_map):
   return names
 
 
+def schedule_map_to_code(schedule_map: isl.union_map):
+  printer = isl.printer.to_file_path('/tmp/1.c')
+  printer.set_output_format(isl.format.C)
+  builder = isl.ast_build()
+  ast: isl.ast_node = builder.node_from_schedule_map(schedule_map)
+  options = isl.ast_print_options.alloc()
+  ast.print(printer, options)
+  printer.flush()
+
+  return CSource('/tmp/1.c')
+
+
 def schedule_to_code(domain: isl.union_map, schedule: isl.map):
   tree = isl.schedule.from_domain(domain)
   tree = tree.insert_partial_schedule(schedule.as_multi_union_pw_aff())
@@ -92,3 +103,14 @@ def schedule_to_code(domain: isl.union_map, schedule: isl.map):
   printer.flush()
 
   return CSource('/tmp/1.c')
+
+
+def schedule_tree_to_code(isl_schedule: isl.schedule, i=0):
+  build = isl.ast_build.from_context(isl.set(" { : } "))
+  ast_node = build.node_from(isl_schedule)
+  printer = isl.printer.to_file_path(f'/tmp/{i}.c')
+  printer = printer.set_output_format(isl.format.C)
+  options = isl.ast_print_options.alloc()
+  printer = ast_node.print(printer, options)
+  printer = printer.flush()
+  return CSource(f'/tmp/{i}.c')
